@@ -1,0 +1,652 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+Sys.setlocale(category = "LC_ALL", locale = "Chinese")
+```
+
+```{r}
+#setwd("C:/Users/milho/OneDrive/Desktop/data")
+data_1<-read.csv("game_data_1.csv",header = T,encoding ="UTF-8")
+data_2<- read.csv("game_data_2.csv", header = T, encoding = "UTF-8")
+```
+
+```{r}
+str(data_1)
+```
+```{r}
+str(data_2)
+```
+```{r}
+head(data_1)
+```
+
+
+
+```{r}
+colnames(data_1)=c('uid','sex','level','x','pur_amount','num_of_pur','date_last_pur','date_sign_up','active_days','num_x33',
+                   'num_arena','num_reward','num_main','num_secret','num_fam_abyss','num_fam_battle','main_schedule','daily_33',
+                   'daily_arena','daily_reward','daily_main')
+names(data_1)
+```
+
+```{r}
+summary(data_1)
+```
+
+```{r}
+data_1$sex<-as.factor(data_1$sex)
+
+data_1$sex<- ifelse(data_1$sex== "男",0,1)
+
+unique(data_1$sex)
+```
+
+```{r}
+data_1$level<-as.factor(data_1$level)
+
+sum(is.na(data_1$level))
+sum(is.null(data_1$level))
+```
+
+```{r}
+table(data_1$level)
+```
+
+```{r}
+#忍生，下忍、中忍、上忍、狂忍、超忍、影忍、极忍、最高的幻忍
+levels(data_1$level)
+```
+
+
+```{r}
+levels(data_1$level)<- c(6,9,8,5,1,4,2,7,3)
+```
+
+
+```{r}
+data_1$level<- as.numeric(as.character(data_1$level))
+```
+
+```{r}
+data_1$x<-as.factor(data_1$x)
+```
+```{r}
+table(data_1$x)
+levels(data_1$x)
+
+levels(data_1$x)<-c(0,2,3,4,5,1)
+```
+```{r}
+sum(is.na(data_1$x))
+```
+
+
+
+```{r}
+data_1$x<-as.numeric(as.character(data_1$x))
+```
+
+
+```{r}
+library(tidyverse)
+```
+```{r}
+sum(data_1$date_last_pur==0)
+```
+```{r}
+date<-data_1$date_last_pur
+```
+
+```{r}
+date<-as.POSIXct(date, format= "%Y-%m-%d %H:%M:%S")
+```
+
+```{r}
+date<-format(date, format = "%Y-%m-%d")
+```
+
+```{r}
+date[is.na(date)]<-"0"
+```
+
+```{r}
+#date
+```
+
+```{r}
+length(date)
+```
+
+```{r}
+date_2<-data_1$date_sign_up
+date_2<-as.POSIXct(date_2, format= "%Y-%m-%d %H:%M:%S")
+date_2<-format(date_2, format = "%Y-%m-%d")
+date_2[is.na(date_2)]<-"0"
+data_1<-data_1%>%
+  mutate(date_sign_up=date_2)%>%
+  mutate(date_last_pur=date)
+  
+```
+
+#dataset 2
+```{r}
+head(data_2)
+```
+
+```{r}
+data_2_sub_1<-data_2%>%
+select(c(3,6,10,14,16))
+```
+
+
+```{r}
+head(data_2_sub_1)
+```
+
+
+```{r}
+colnames(data_2_sub_1)<- c("server","rank_city","type_player","avg_daily_battle","rating")
+```
+
+
+```{r}
+data_2_sub_1$server<-as.factor(data_2_sub_1$server)
+levels(data_2_sub_1$server)<-c(2,1)
+levels(data_2_sub_1$server)
+data_2_sub_1$server<-as.numeric(as.character(data_2_sub_1$server))
+head(data_2_sub_1)
+```
+
+```{r}
+table(data_2_sub_1$rank_city)
+class(data_2_sub_1$rank_city)
+```
+
+```{r}
+data_2_sub_1$rank_city<-as.factor(data_2_sub_1$rank_city)
+```
+
+```{r}
+data_2_sub_1<-data_2_sub_1%>%
+mutate(rank_city=fct_recode(data_2_sub_1$rank_city,"level_0"="港澳台",
+"level_0"="国外",
+"level1"="一线城市",
+"level2"="二线城市",
+"level3"="三线城市",
+"level4"="四线城市",
+"level5"="五线城市",
+"Unknown"="未知"))%>%
+mutate(type_player=fct_recode(type_player,
+"low"="无付费用户",
+"medium"="一般保持用户",
+"medium"="一般发展用户",
+"medium"="一般价值用户",
+"medium"="一般挽留用户",
+"high"="重要保持用户",
+"high"="重要发展用户",
+"high"="重要价值用户",
+"high"="重要挽留用户"))
+```
+
+```{r}
+head(data_2_sub_1)
+```
+```{r}
+table(data_2_sub_1$type_player)
+sum(c(46691,20554,13641))
+```
+```{r}
+table(data_2_sub_1$rank_city)
+sum(c(15460     ,  26  ,    117  ,  19602 ,   13583   ,  1831    , 6946   , 23321 ))
+```
+
+```{r}
+data_1<- data_1%>%
+mutate(data_2_sub_1)
+head(data_1)
+```
+
+```{r}
+#write.csv(data_1,"project_data.csv")
+```
+
+```{r}
+data<- read.csv("project_data.csv")
+```
+
+```{r}
+head(data)
+```
+
+```{r}
+summary(data)
+```
+
+
+# imbalanced
+# too many features
+# scaling features
+# dimension reduction
+
+```{r}
+#normalize<- function(x) {
+  #return((x-min(x))/(max(x)-min(x)))
+#}
+```
+
+```{r}
+subset_outlier<- data[9:21]
+#subset_outlier_normal<- cbind(as.data.frame(lapply(subset_outlier, normalize)))
+```
+
+```{r}
+# Outlier detection and remove
+#library(OutlierDetection)
+#library(OutliersO3)
+#library(outliers)
+```
+
+```{r}
+#?maha
+```
+
+```{r}
+subset_outlier<- data[9:21]
+subset_outlier
+```
+```{r}
+#maha(x= subset_outlier,cutoff=0.999995)
+```
+
+```{r}
+#manually maha
+MD<- mahalanobis(subset_outlier,colMeans(subset_outlier),cov(subset_outlier))
+subset_outlier$MD<-round(MD,5)
+subset_outlier$p_value<- pchisq(subset_outlier$MD,df=ncol(subset_outlier)-1,lower.tail = F)
+subset_outlier$outlier<- FALSE
+subset_outlier$outlier[subset_outlier$p_value< 0.0001]<- TRUE
+summary(subset_outlier$outlier)
+```
+```{r}
+subset_outlier
+```
+```{r}
+new_df<-data%>%
+  mutate(outlier=subset_outlier$outlier)%>%
+  filter(outlier== "FALSE")
+```
+
+```{r}
+head(new_df)
+```
+```{r}
+dim(new_df)
+```
+
+
+#notice now the "new_df" is the data with outlier removed and "data" is the one with outliers
+
+
+
+```{r}
+normalize<- function(x) {
+  return((x-min(x))/(max(x)-min(x)))
+}
+```
+
+
+
+```{r}
+num_df<- new_df[,c(3:6,9:21,25,26)]
+num_data_normal<- cbind(as.data.frame(lapply(num_df, normalize)))
+```
+
+```{r}
+head(num_data_normal)
+```
+
+```{r}
+new_df<-new_df%>%
+  mutate(new_df[,c(3:6,9:21,25,26)]<-num_data_normal)
+```
+
+```{r}
+new_df
+```
+# Feature Reduction
+
+```{r}
+#heatmap
+
+cormat<- round(cor(new_df[,c(3:6,9:21,25,26)]),2)
+```
+
+```{r}
+library(reshape2)
+melted_cormat <- melt(cormat)
+head(melted_cormat)
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile()+theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1),
+                    plot.margin = margin(t = 20,  # Top margin
+                             r = 50,  # Right margin
+                             b = 40,  # Bottom margin
+                             l = 10))+ # Left margin
+  geom_text(aes(Var2, Var1, label = value),
+          color = "black", size = 2)
+```
+
+```{r}
+tmp <- round(cor(new_df[,c(3:6,9:21,25,26)]),2)
+tmp[upper.tri(tmp)] <- 0
+diag(tmp) <- 0
+
+# Above two commands can be replaced with 
+# tmp[!lower.tri(tmp)] <- 0
+
+ 
+dfdf <- 
+  new_df[, !apply(tmp, 2, function(x) any(abs(x) > 0.76, na.rm = TRUE))]
+dfdf
+```
+
+```{r}
+dfdf[,-c(16,17)]
+```
+```{r}
+dfdf$type_player<- as.numeric(as.factor(dfdf$type_player))
+```
+
+```{r}
+summary(dfdf$type_player)
+```
+
+```{r}
+df_num<- new_df[,c(6,10:16,24)]
+str(df_num)
+```
+```{r}
+head(df_num)
+```
+
+```{r}
+df_num[0:8]
+```
+
+```{r}
+#heatmap
+cormat_num<- round(cor(df_num[0:8]),2)
+```
+
+```{r}
+library(reshape2)
+melted_cormat <- melt(cormat_num)
+head(melted_cormat)
+```
+
+
+```{r}
+df_num[,-c(2,7,8)]
+```
+
+```{r}
+df_num<-df_num[,-c(2,7,8)]
+dim(df_num)
+```
+```{r}
+df_num
+```
+
+```{r}
+library(dplyr)
+library(randomForest)
+library(caret)
+```
+
+```{r}
+df_num$type_player<-as.factor(df_num$type_player)
+```
+
+```{r}
+set.seed(1233)
+df_num_fs<- sample_n(df_num,21000)
+```
+
+```{r}
+head(df_num_fs)
+```
+#```{r}
+control <- trainControl(method="repeatedcv", number=5, repeats=5)
+model <- train(type_player~., data=df_num_fs, method="lvq", preProcess="scale", trControl=control)
+# estimate variable importance
+importance <- varImp(model, scale=FALSE)
+# summarize importance
+print(importance)
+# plot importance
+plot(importance)
+#```
+
+```{r}
+df_num[,-2]
+```
+
+
+```{r}
+df_num<-df_num[,-2]
+df_num
+```
+
+```{r}
+set.seed(1233)
+df_num_fs<- df_num
+```
+
+```{r}
+df_num_fs
+```
+
+```{r}
+set.seed(1233)
+trainIndex<- createDataPartition(df_num_fs$type_player, p = .75, 
+                                  list = FALSE, 
+                                  times = 1)
+
+df_num_t<- df_num_fs[trainIndex,]
+df_num_v<- df_num_fs[-trainIndex,]
+
+dim(df_num_t)
+dim(df_num_v)
+```
+```{r}
+head(df_num_t)
+
+head(df_num_v)
+```
+
+```{r}
+#hist(as.numeric(df_num_t$type_player), col='steelblue', main='Original')
+```
+```{r}
+log_df<-df_num_fs
+```
+```{r}
+#install.packages("moments")
+```
+
+```{r}
+library(moments)
+skewness(log_df$num_reward)
+```
+
+```{r}
+log_df$num_reward<- log(log_df$num_reward+3)
+log_df$num_main<- log(log_df$num_main+3)
+log_df$num_secret<- log(log_df$num_secret+3)
+log_df$num_of_pur<- log(log_df$num_of_pur+3)
+```
+
+```{r}
+skewness(log_df$num_reward)
+```
+
+```{r}
+set.seed(1233)
+trainIndex<- createDataPartition(log_df$type_player, p = .75, 
+                                  list = FALSE, 
+                                  times = 1)
+
+log_num_t<- log_df[trainIndex,]
+log_num_v<- log_df[-trainIndex,]
+
+dim(log_num_t)
+dim(log_num_v)
+```
+
+```{r}
+sum(is.na(log_num_t))
+
+sum(is.na(log_num_v))
+```
+
+```{r}
+#hist(log_num_t$num_fam_battle, col='steelblue', main='Original')
+```
+
+```{r}
+
+# for Pair 1 
+Train_Control<- trainControl(method = "repeatedcv",repeats = 10, number = 10)
+
+knn_fit_fs<- train(type_player~., 
+                   data = log_num_t, 
+                   method= "knn",
+                  trControl= Train_Control,
+                  tuneGrid= expand.grid(k = c(1:10)))
+```
+```{r}
+knn_fit_fs$times
+```
+
+```{r}
+plot(knn_fit_fs)
+```
+```{r}
+knn_test_pred_fs<- predict(knn_fit_fs, newdata = log_num_v,k=3)
+#test_pred
+```
+
+```{r}
+#install.packages("mltools")
+install.packages("mcc")
+```
+
+```{r}
+require(mltools)
+preds <- knn_test_pred_fs
+actuals <- as.factor(log_num_v$type_player)
+mcc(preds, actuals)
+```
+
+
+```{r}
+tree_fs<- train(type_player~.,
+                data = log_num_t,
+                method= "rpart",
+                parms= list(split= "gini"),
+                trControl= Train_Control,
+                tuneLength= 10)
+```
+```{r}
+tree_fs$times
+```
+```{r}
+tree_fs$results
+```
+
+```{r}
+tree_test_pred_fs<- predict(tree_fs, newdata =log_num_v ,cp = 0.0008540373)
+```
+
+```{r}
+require(mltools)
+preds <- tree_test_pred_fs
+actuals <- as.factor(log_num_v$type_player)
+mcc(preds, actuals)
+```
+```{r}
+dim(log_num_t)
+```
+
+```{r}
+mtry <- sqrt(ncol(log_num_t)-1)
+
+forest_fs<- train(type_player~.,
+                data = log_num_t ,
+                method= "rf",
+                metric = "Accuracy",
+                trControl= trainControl(method = "repeatedcv",repeats = 5, number = 5, search = "random"),
+                tuneLength= 15 )
+
+```
+```{r}
+forest_fs$times
+```
+
+```{r}
+
+forest_test_pred_fs<- predict(forest_fs, newdata =log_num_v ,mtry = 1)
+
+```
+
+```{r}
+require(mltools)
+preds <- forest_test_pred_fs
+actuals <- as.factor(log_num_v$type_player)
+mcc(preds, actuals)
+```
+
+```{r}
+rad_svm_fs <- train(type_player~., 
+                    data =log_num_t, 
+                    method = "svmRadial", 
+                    trControl = trainControl(method = "repeatedcv",repeats = 5, number = 5, search = "random"), 
+                    tuneLength = 10)
+```
+
+```{r}
+rad_svm_fs$bestTune
+```
+```{r}
+rad_svm_fs$times
+```
+
+```{r}
+svm_test_pred_fs<- predict(rad_svm_fs, newdata = log_num_v,c=21.23908	, sigma=0.0351294	)
+```
+
+```{r}
+require(mltools)
+preds <- svm_test_pred_fs
+actuals <- as.factor(log_num_v$type_player)
+mcc(preds, actuals)
+```
+
+
+```{r}
+Grid <-  expand.grid(size  = c(1:5),
+                      decay = c(0, 10^(-2), 10^(-3), 10^(-4)))
+nn_fs<- train(type_player~., 
+              data = log_num_t,
+                  method = "nnet",
+                  trControl= Train_Control,
+                  preProcess=c("scale","center"),
+              tuneGrid= Grid
+)
+```
